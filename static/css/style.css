@@ -11,7 +11,12 @@
     --accent-dark: #3D1534;
     --line:  #27425D;
     --text-muted: #27425D;
-    --radius: 4px;
+    --highlight: #C18DB4;
+    --highlight-dark: #2C3A6B;
+    --skills-bg: #0E1b48;
+    --projects-bg: #87A7D0;
+    --radius: 8px; /* menambahkan Tingkat kelengkungan sudut kotak*/
+
 }
 
 body {
@@ -193,3 +198,5 @@ h1, .brand {
         justify-content: flex-start;
     }
 }
+
+   
