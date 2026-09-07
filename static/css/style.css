@@ -87,6 +87,7 @@ h1, .brand {
 }
 
 .hero-kicker {
+    font-family:"Source Serif 4", serif;
     font-size: 0.85rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -198,5 +199,160 @@ h1, .brand {
         justify-content: flex-start;
     }
 }
+
+/* SKILLS SECTION */
+/* Background gelap (navy) supaya kontras dengan hero & projects di atas/bawahnya */
+.skills {
+    padding: 2rem 0 4rem;
+    background-color: var(--skills-bg);
+}
+
+/*Untuk mengatur tulisan "What i bring" */
+.skills-kicker {
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--highlight);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+/*Untuk mengatur tulisan "SKILLS*/
+.skills-title {
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    color: var(--paper);
+    margin-bottom: 0.5rem;
+    line-height: 1.4; 
+}
+
+/* Grid 2 kolom untuk daftar skill, otomatis jadi 1 kolom di layar sempit */
+.skills-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem 3rem;
+}
+
+/*Untuk mengatur tulisan Writing, dll*/
+.skill-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    color: var(--paper);
+}
+
+.dots {
+    display: flex;
+    gap: 5px;
+}
+
+/* Titik default (belum "menyala") */
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--highlight-dark);
+}
+
+/* Titik yang "menyala", diaktifkan dengan class .on di HTML */
+.dot.on {
+    background-color: var(--highlight);
+}
+
+/* PROJECTS SECTION */
+.projects {
+    padding: 2.5rem 0 5rem;
+    background-color: var(--projects-bg);
+}
+
+.projects-kicker {
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 700;
+    margin-bottom: 0rem;
+}
+
+.projects-title {
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    margin-bottom: 0.75rem;
+}
+
+/* Untuk membuat layout responsif: auto-fit + minmax bikin jumlah kolom otomatis menyesuaikan lebar layar */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+.project-card {
+    background-color: #FFFFFF;
+    border: 1px solid var(--accent-dark);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    position: relative;
+    text-decoration: none;
+    color: var(--ink);
+    display: block;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Efek hover: kartu "terangkat" dan muncul shadow tebal */
+.project-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+.project-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.project-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+    padding-right: 1.5rem;
+}
+
+.project-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.project-arrow {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--ink);
+}
+
+/* Responsive: skill list jadi 1 kolom di layar sempit */
+@media (max-width: 600px) {
+    .skills-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+    
+
+
 
    
