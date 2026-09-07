@@ -23,7 +23,7 @@ Progress minggu ini ada tugas individu 1:
 - Menambahkan bagian Skills dengan indikator rating berbentuk dot
 - Menambahkan bagian Projects yang menampilkan 3 project saya, masing-masing terhubung ke file PDF
 - Menyesuaikan tata letak responsif untuk skill list dan project grid
--Melakukan deploy ke PWS (Pacil Web Service)
+- Melakukan deploy ke PWS (Pacil Web Service).
 
 
 
