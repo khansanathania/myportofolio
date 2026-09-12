@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from main.models import Experience
+from main.models import Experience, Achievement
 
 
 class MainTest(TestCase):
@@ -56,3 +56,27 @@ class MainTest(TestCase):
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
+
+class AchievementTest(TestCase):
+    def setUp(self):
+        self.achievement = Achievement.objects.create(
+            title="Gold Medal International Science and Invention Fair",
+            description="Test description",
+            issuer="Indonesian Young Scientist Association",
+            issued_at="2024-11-01",
+        )
+
+    def test_achievement_url_is_accessible(self):
+        response = self.client.get(reverse("main:show_achievement"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "achievement.html")
+
+    def test_achievement_page_shows_data(self):
+        response = self.client.get(reverse("main:show_achievement"))
+        self.assertContains(response, self.achievement.title)
+        self.assertContains(response, self.achievement.issuer)
+
+    def test_empty_achievement_page(self):
+        Achievement.objects.all().delete()
+        response = self.client.get(reverse("main:show_achievement"))
+        self.assertContains(response, "Belum ada pencapaian yang ditambahkan.")
