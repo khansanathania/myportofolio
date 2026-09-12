@@ -24,3 +24,13 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+    
+class Achievement(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    issuer = models.CharField(max_length=255)
+    issued_at = models.DateField()
+    credential_url = models.URLField(blank = True, default ="")
+        # untuk memnetukan tampilan teks
+    def __str__(self):
+        return f"{self.title} - {self.issuer}"
