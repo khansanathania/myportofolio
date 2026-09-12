@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 from main.models import Experience, Achievement
 
@@ -31,3 +31,11 @@ def show_achievement(request):
         "achievement_list" : Achievement.objects.all(),
     }
     return render(request,"achievement.html", context)
+
+def show_achievement_detail(request, id):
+    achievement = get_object_or_404(Achievement, id=id)
+    context = {
+        "name": "Khansa Nathania Khairunnisa",
+        "achievement": achievement,
+    }
+    return render(request, "achievement_detail.html", context)
