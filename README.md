@@ -26,6 +26,24 @@ Progress minggu ini ada tugas individu 1:
 - Melakukan deploy ke PWS (Pacil Web Service).
 
 
+### Tugas 2
+1. Saat saya membuka /achievement/, request dari browser pertama kali masuk ke portofolio/urls.py, lalu diteruskan ke main/urls.py. Django kemudian mencocokkan URL achievement/ dengan route yang tersedia dan menjalankan fungsi show_achievement di views.py. Fungsi tersebut mengambil semua data dengan Achievement.objects.all(), lalu mengirimkannya melalui context ke template achievement.html. Template menampilkan data tersebut menjadi kartu, kemudian hasil HTML dikirim kembali ke browser untuk ditampilkan.
+Untuk /achievement/1/, prosesnya sama, tetapi main/urls.py mengambil angka 1 sebagai id. show_achievement_detail kemudian mencari achievement berdasarkan id tersebut menggunakan get_object_or_404. Jika ditemukan, datanya ditampilkan melalui achievement_detail.html, sedangkan jika tidak ditemukan akan muncul halaman 404.
+2. Data achievement saya simpan di model, bukan ditulis langsung di HTML, karena kalau ditulis manual, setiap kali ada achievement baru saya harus menambahkan kode lagi di HTML. Hal ini bisa membuat kode menjadi lebih panjang dan berisiko terjadi kesalahan. Dengan menyimpan data di model, saya cukup menambahkan data achievement melalui database, kemudian template akan menampilkannya secara otomatis. Jadi, saya tidak perlu mengubah kode HTML setiap kali menambahkan achievement baru.
+3. `makemigrations` digunakan untuk membuat catatan perubahan yang dilakukan pada `models.py`, sedangkan `migrate` digunakan untuk menerapkan perubahan tersebut ke database. Jadi, setelah melakukan perubahan pada model, saya menjalankan `makemigrations` terlebih dahulu agar Django membuat migration-nya, kemudian menjalankan `migrate` agar perubahan tersebut benar-benar diterapkan ke database. Contohnya, saat saya mengganti nama model dari `Certification` menjadi `Achievement`, saya memilih “y” ketika Django menanyakan apakah perubahan tersebut merupakan rename, lalu menjalankan `migrate` agar perubahan diterapkan tanpa kehilangan data yang sudah ada.
+
+Penggunaan AI:
+https://share.gemini.google/1QObPfqzkScT
+Dalam pengerjaan tugas ini, saya menggunakan Gemini sebagai AI assistant untuk membantu memahami beberapa konsep dan mencari solusi ketika mengalami kendala dalam pengerjaan project. Saya menggunakan Gemini untuk berdiskusi mengenai penggunaan get_object_or_404, {% if %} pada template Django, cara menampilkan gambar dari Google Drive, penggunaan atribut alt pada img, serta pengaturan margin-top pada CSS.
+
+Strategi prompting yang saya gunakan adalah menjelaskan kendala atau kode yang sedang saya kerjakan, kemudian menanyakan fungsi atau cara memperbaikinya. Setelah mendapatkan saran dari Gemini, saya mencoba menerapkannya langsung pada project dan melihat apakah hasilnya sesuai. Jika saran yang diberikan tidak berhasil, saya menyesuaikannya dengan kondisi project saya. Contohnya, format link Google Drive yang diberikan Gemini tidak langsung berhasil, sehingga saya mencoba dan menggunakan format lain yang dapat menampilkan gambar sertifikat di website.
+
+AI digunakan sebagai alat bantu untuk memahami konsep dan mencari solusi, bukan untuk menggantikan seluruh proses pengerjaan. Saya tetap melakukan implementas kode secara mandiri, dan menyesuaikan hasilnya sendiri. Bukti penggunaan AI berupa chat/log percakapan dengan Gemini yang saya sertakan bersama tugas ini.
+
+
+
+
+
 
 
 
