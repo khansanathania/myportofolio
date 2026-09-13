@@ -80,3 +80,17 @@ class AchievementTest(TestCase):
         Achievement.objects.all().delete()
         response = self.client.get(reverse("main:show_achievement"))
         self.assertContains(response, "Belum ada pencapaian yang ditambahkan.")
+
+    def test_achievement_detail_url_is_accessible(self):
+        response = self.client.get(
+            reverse("main:show_achievement_detail", args=[self.achievement.id])
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "achievement_detail.html")
+        self.assertContains(response, self.achievement.title)
+
+    def test_achievement_detail_returns_404_if_not_found(self):
+        response = self.client.get(
+            reverse("main:show_achievement_detail", args=[9999])
+        )
+        self.assertEqual(response.status_code, 404)
