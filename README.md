@@ -19,7 +19,7 @@ Penggunaan AI:
 https://share.gemini.google/D9X7XpNxK497
 Saya berencana untuk menggunakan AI untuk mengganti desain untuk bagian projects yang sebelumnya menggunakan emoticon (sebab belum memiliki aset design berbentuk png) setelah saya mampunyai aset tersebut saya hendak untuk menggantinya menggunakan cara yang sama seperti saat saya mengupdate foto profil milik saya namun dalam bingkai berbentuk lingkaran dan dengan background warna biru, namun ketika saya mencoba gambar tersebut tidak terload dan apabila terload size berukuran sangat besar dan tidak memiliki background. Saya bertanya pada ai, namun solusi yang diberikan tidak relevan dengan kebutuhan saya, sehingga saya tidak mengganti code sebelumnya, tetap menggunakan emoticon.
 
-Progress minggu ini ada tugas individu 1:
+Progress minggu ini tugas individu 1:
 - Menambahkan bagian Skills dengan indikator rating berbentuk dot
 - Menambahkan bagian Projects yang menampilkan 3 project saya, masing-masing terhubung ke file PDF
 - Menyesuaikan tata letak responsif untuk skill list dan project grid
@@ -39,6 +39,14 @@ Dalam pengerjaan tugas ini, saya menggunakan Gemini sebagai AI assistant untuk m
 Strategi prompting yang saya gunakan adalah menjelaskan kendala atau kode yang sedang saya kerjakan, kemudian menanyakan fungsi atau cara memperbaikinya. Setelah mendapatkan saran dari Gemini, saya mencoba menerapkannya langsung pada project dan melihat apakah hasilnya sesuai. Jika saran yang diberikan tidak berhasil, saya menyesuaikannya dengan kondisi project saya. Contohnya, format link Google Drive yang diberikan Gemini tidak langsung berhasil, sehingga saya mencoba dan menggunakan format lain yang dapat menampilkan gambar sertifikat di website.
 
 AI digunakan sebagai alat bantu untuk memahami konsep dan mencari solusi, bukan untuk menggantikan seluruh proses pengerjaan. Saya tetap melakukan implementas kode secara mandiri, dan menyesuaikan hasilnya sendiri. Bukti penggunaan AI berupa chat/log percakapan dengan Gemini yang saya sertakan bersama tugas ini.
+
+Progress minggu ini tugas individu 2:
+- Menambahkan model Achievement dengan 4 field (title, description, issuer, issued_at, credential_url)
+- Membuat halaman daftar Achievement (/achievement/) yang menampilkan seluruh data lewat perulangan Django Template Language, beserta tampilan kondisi kosong
+- Membuat halaman detail Achievement (/achievement/<id>/) yang menampilkan informasi lengkap satu pencapaian beserta gambar sertifikat, sebagai fitur tambahan di luar instruksi wajib
+- Mendaftarkan named route untuk kedua halaman di main/urls.py dan menambahkan tautan navbar yang konsisten di seluruh halaman
+- Menambahkan unit test untuk halaman daftar dan detail Achievement (aksesibilitas URL, kemunculan data, kondisi kosong, dan penanganan 404)
+- Melakukan deploy ke PWS (Pacil Web Service)
 
 
 
