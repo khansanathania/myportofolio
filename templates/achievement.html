@@ -10,15 +10,36 @@
        <section class = "experience-section" id = "achievement">
             <div class = "container">
                 <p class = "section-kicker"> Pencapaian yang saya raih </p>
-                <h1>Achievement</h1>
-
-                <div class = "experience-grid">
+                <div class="project-header">
+                    <h1>Achievement</h1>
+                    <a href="{% url 'main:create_achievement' %}"
+                        class="button project-add-button">
+                            <span aria-hidden="true">+</span>
+                            Tambah Pencapaian
+                    </a>
+                </div>
+                    <form method="get"
+                        action="{% url 'main:show_achievement' %}"
+                        class="project-search">
+                    <input type="search"
+                            name="title"
+                            value="{{ title_query }}"
+                            placeholder="Cari berdasarkan nama pencapaian"
+                            class="project-search__input"
+                            aria-label="Cari berdasarkan nama pencapaian">
+                    <button type="submit" class="button">Cari</button>
+                </form>
+                <div class = "experience-grid achievement-grid">
                     {% for achievement in achievement_list %}
                     <article class = "experience-card">
+                        {% if achievement.credential_url %}
+                            <img
+                                src="{{ achievement.credential_url }}"
+                                alt="{{ achievement.title }}"
+                                class="achievement-image">
+                        {% endif %}
                         <h2>
-                            <a href = "{% url 'main:show_achievement_detail' achievement.id %}">
-                                {{  achievement.title  }}
-                            </a>
+                            {{  achievement.title  }}
                         </h2>
                         <p class = "experience-description" > 
                             {{ achievement.description }}
@@ -29,15 +50,15 @@
                         <p class = "experience-status">
                             {{  achievement.issued_at }}
                         </p>
+                        {% include "components/achievement_delete_modal.html" with achievement=achievement %}
                     </article>
-                {% empty %}
-                    <p class="empty-state">
-                        Belum ada pencapaian yang ditambahkan.
-                    </p>
-                {% endfor %}
-              </div>
-            </div>
-        </section>
-    </main>
-
-{% endblock content %}
+                    {% empty %}
+                        <p class="empty-state">
+                            Belum ada pencapaian yang ditambahkan.
+                        </p>
+                    {% endfor %}
+                </div>
+                </div>
+            </section>
+        </main>
+   {% endblock content %}
