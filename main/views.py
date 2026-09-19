@@ -82,3 +82,17 @@ def delete_achievement(request, achievement_id):
         return redirect("main:show_achievement")
 
     return redirect("main:show_achievement")
+
+def update_achievement(request, id):
+    achievement = get_object_or_404(Achievement, id= id)
+    form = AchievementForm(request.POST or None, instance=achievement)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Pencapaian berhasil diperbaharui! ")
+        return redirect("main:show_achievement")
+    context = {
+        "name" : "Khansa Nathania Khairunnisa",
+        "form" : form,
+    }
+    return render(request, "achievement_form.html", context)
