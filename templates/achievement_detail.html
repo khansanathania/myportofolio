@@ -10,25 +10,32 @@
             <div class="container">
                 <p class="section-kicker">Detail Pencapaian</p>
                 <h1>{{ achievement.title }}</h1>
-
+                <div class="experience-grid achievement-grid">
+                <article class="experience-card">
+                    {% if achievement.credential_url %}
+                    <img
+                        src="{{ achievement.credential_url }}"
+                        alt="{{ achievement.title }}"
+                        class="achievement-image">
+                    {% endif %}
+                    <h2>
+                        {{ achievement.title }}
+                    </h2>
+                <p class="experience-description">
+                        {{ achievement.description }}
+                </p>
                 <p class="experience-description">
                     Diberikan oleh {{ achievement.issuer }}
                 </p>
                 <p class="experience-status">
                     {{ achievement.issued_at }}
                 </p>
-                <p class="experience-description">
-                    {{ achievement.description }}
-                </p>
-
-                {% if achievement.credential_url %}
-                    <img src="{{ achievement.credential_url }}" alt="Sertifikat {{ achievement.title }}" style="max-width: 100%; border-radius: 8px; margin-top: 1rem;">
-                {% endif %}
-
-                <p style="margin-top: 2rem;">
-                    <a href="{% url 'main:show_achievement' %}">&larr; Kembali ke daftar Achievement</a>
-                </p>
-            </div>
+            </article>
+        </div>
+        <p style="margin-top: 2rem;">
+            <a href="{% url 'main:show_achievement' %}">&larr; Kembali ke daftar Achievement</a>
+        </p>
+        </div>
         </section>
     </main>
 {% endblock content %}
