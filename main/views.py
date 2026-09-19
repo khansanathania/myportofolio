@@ -29,16 +29,17 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_achievement(request):
-    title_query = request.GET.get("title", "").strip()
-    achievement_list = Achievement.objects.all()
+    json_response = get_achievements_json(request)
+    achievements = serializers.deserialize(
+        "json", json_response.content.decode("utf-8")
+    )
 
-    if title_query:
-        achievement_list = achievement_list.filter(title__icontains=title_query)
+    achievement_list = [achievement.object for achievement in achievements]
 
     context = {
         "name": "Khansa Nathania Khairunnisa",
         "achievement_list": achievement_list,
-        "title_query": title_query,
+        "title_query": request.GET.get("title", "").strip(),
     }
     return render(request,"achievement.html", context)
 
