@@ -61,6 +61,7 @@ def create_achievement(request):
     context = {
         "name": "Khansa Nathania Khairunnisa",
         "form": form,
+        
     }
     return render(request, "achievement_form.html", context)
 
@@ -95,5 +96,6 @@ def update_achievement(request, id):
     context = {
         "name" : "Khansa Nathania Khairunnisa",
         "form" : form,
+        "achievement" : achievement
     }
     return render(request, "achievement_form.html", context)
