@@ -8,9 +8,13 @@
     <main>
         <section class="experience-section">
             <div class="container">
-                <h1>Tambah Pencapaian Baru</h1>
+                {% if achievement %}
+                    <h1>Edit Pencapaian</h1>
+                {% else %}
+                    <h1>Tambah Pencapaian Baru</h1>
+                {% endif %}
                 <form method="post"
-                      action="{% url 'main:create_achievement' %}"
+                     action="{% if achievement %}{% url 'main:update_achievement' achievement.id %}{% else %}{% url 'main:create_achievement' %}{% endif %}"
                       class="project-form">
                     {% csrf_token %}
                     {% for field in form %}
@@ -22,7 +26,13 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
-                    <button type="submit" class="button">Tambah Pencapaian</button>
+                    <button type="submit" class="button">
+                        {% if achievement %}
+                            Simpan Perubahan
+                        {% else %}
+                            Tambah Pencapaian
+                        {% endif %}
+                    </button>
                     <a href="{% url 'main:show_achievement' %}" class="button button-secondary">Batal</a>
                 </form>
             </div>
