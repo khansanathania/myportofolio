@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -9,6 +11,7 @@ from django.http import HttpResponse
 
 
 def show_main(request):
+    last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
     context = {
         "name": "Khansa Nathania",
         "npm": "2506618061",
@@ -19,6 +22,7 @@ def show_main(request):
             "audit, and writing. Always exploring new ideas, developing analytical "
             "skills, and learning through both academic and teaching experiences."
         ),
+        "last_login": last_login,
     }
     return render(request, "index.html", context)
 
@@ -120,8 +124,11 @@ def login_user(request):
     form = AuthenticationForm(request, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        login(request, form.get_user())
-        return redirect("main:show_main")
+        user = form.get_user()
+        login(request, user)
+        response = redirect("main:show_main")
+        response.set_cookie('last_login', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        return response
 
     context = {
         "name": "Khansa Nathania Khairunnisa",
@@ -131,4 +138,6 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    return redirect("main:show_main")
+    response = redirect("main:show_main")
+    response.delete_cookie('last_login')
+    return response
