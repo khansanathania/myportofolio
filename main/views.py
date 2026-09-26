@@ -3,6 +3,8 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from main.models import Experience, Achievement
 from main.forms import AchievementForm
@@ -57,7 +59,11 @@ def show_achievement_detail(request, id):
     }
     return render(request, "achievement_detail.html", context)
 
+
+@login_required(login_url="/login/")
 def create_achievement(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     form = AchievementForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -77,11 +83,14 @@ def get_achievements_json(request):
 
     if title_query:
         achievements = achievements.filter(title__icontains=title_query)
-
-    achievements_json = serializers.serialize("json", achievements)
+    achievements_json = serializers.serialize("json", achievements, use_natural_foreign_keys=True)
     return HttpResponse(achievements_json, content_type="application/json")
 
+
+@login_required(login_url="/login/")
 def delete_achievement(request, achievement_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     achievement = get_object_or_404(Achievement, pk=achievement_id)
 
     if request.method == "POST":
@@ -141,3 +150,16 @@ def logout_user(request):
     response = redirect("main:show_main")
     response.delete_cookie('last_login')
     return response
+
+# Tanpa cek is_superuser: semua akun yang sudah login boleh memberi star
+@login_required(login_url="/login/")
+def toggle_star(request, achievement_id):
+    achievement = get_object_or_404(Achievement, pk=achievement_id)
+
+    if request.method == "POST":
+        if request.user in achievement.starred_by.all():
+            achievement.starred_by.remove(request.user)
+        else:
+            achievement.starred_by.add(request.user)
+
+    return redirect("main:show_achievement")

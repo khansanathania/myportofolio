@@ -1,4 +1,5 @@
 import uuid
+from django.contrib.auth.models import User
 from django.db import models
 
 class Experience(models.Model):
@@ -31,6 +32,9 @@ class Achievement(models.Model):
     issuer = models.CharField(max_length=255)
     issued_at = models.DateField()
     credential_url = models.URLField(blank = True, default ="")
+    starred_by = models.ManyToManyField(
+        User, related_name="starred_achievements", blank=True
+    )
         # untuk memnetukan tampilan teks
     def __str__(self):
         return f"{self.title} - {self.issuer}"
