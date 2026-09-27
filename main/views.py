@@ -86,7 +86,9 @@ def get_achievements_json(request):
 
     if title_query:
         achievements = achievements.filter(title__icontains=title_query)
-    achievements_json = serializers.serialize("json", achievements, use_natural_foreign_keys=True)
+
+    # Membatasi field JSON agar data sensitif seperti starred_by tidak ikut terekspos
+    achievements_json = serializers.serialize("json", achievements, fields=["title", "description", "issuer", "issued_at", "credential_url"])
     return HttpResponse(achievements_json, content_type="application/json")
 
 
