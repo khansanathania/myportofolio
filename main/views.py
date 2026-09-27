@@ -44,10 +44,13 @@ def show_achievement(request):
 
     achievement_list = [achievement.object for achievement in achievements]
 
+    is_editor = request.user.groups.filter(name="Editor").exists()
+
     context = {
         "name": "Khansa Nathania Khairunnisa",
         "achievement_list": achievement_list,
         "title_query": request.GET.get("title", "").strip(),
+        "is_editor": is_editor,
     }
     return render(request,"achievement.html", context)
 
@@ -100,7 +103,15 @@ def delete_achievement(request, achievement_id):
 
     return redirect("main:show_achievement")
 
+
+@login_required(login_url="/login/")
 def update_achievement(request, id):
+    if not (
+        request.user.is_superuser
+        or request.user.groups.filter(name="Editor").exists()
+    ):
+        raise PermissionDenied
+
     achievement = get_object_or_404(Achievement, id= id)
     form = AchievementForm(request.POST or None, instance=achievement)
 
