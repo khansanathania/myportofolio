@@ -470,6 +470,8 @@ h1, .brand {
 
 .button-secondary {
     background: var(--ink);
+    vertical-align: middle;
+    margin-left: 0.5rem;
 }
 
 .project-header {
@@ -636,6 +638,8 @@ h1, .brand {
 
 .star-form {
     display: inline;
+    margin-right: 0.5rem;
+    vertical-align: middle;
 }
 
 .button-star {
@@ -643,6 +647,7 @@ h1, .brand {
     align-items: center;
     gap: 0.4rem;
     background: var(--ink);
+    vertical-align: middle;
 }
 
 .button-star.is-starred {
