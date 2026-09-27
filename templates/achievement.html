@@ -52,7 +52,7 @@
                         <p class = "experience-status">
                             {{  achievement.issued_at }}
                         </p>
-                        
+                        <!-- Menampilkan fitur star pada setiap achievement -->
                         {% include "components/achievement_star.html" with achievement=achievement %}
 
                         {% if user.is_superuser %}
