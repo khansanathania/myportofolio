@@ -52,17 +52,22 @@
                         <p class = "experience-status">
                             {{  achievement.issued_at }}
                         </p>
+
+                        <div class="achievement-actions" >
+
                         <!-- Menampilkan fitur star pada setiap achievement -->
-                        {% include "components/achievement_star.html" with achievement=achievement %}
+                            {% include "components/achievement_star.html" with achievement=achievement %}
 
+                            {% if user.is_superuser %}
+                                {% include "components/achievement_delete_modal.html" with achievement=achievement %}
+                            {% endif %}
+                        </div>
                         {% if user.is_superuser or is_editor %}
-                            <a href="{% url 'main:update_achievement' achievement.id %}" class="button button-secondary">Edit</a>
+                             <div class="achievement-actions">
+                                <a href="{% url 'main:update_achievement' achievement.id %}" class="button button-secondary">Edit</a> 
+                            </div>
                         {% endif %}
-
-                        {% if user.is_superuser %}
-                            {% include "components/achievement_delete_modal.html" with achievement=achievement %}
-                        {% endif %}
-                        
+                    
                     </article>
                     {% empty %}
                         <p class="empty-state">
