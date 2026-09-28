@@ -68,6 +68,26 @@ Memastikan seluruh fitur dan data yang dipilih dapat tampil dengan baik di halam
 - Melakukan deploy ke PWS (Pacil Web Service)
 
 
+### Tugas 4
+Penggunaan AI
+https://share.gemini.google/L07BUazRJ2Yb
+Dalam pengerjaan tugas ini, saya menggunakan Gemini sebagai AI assistant untuk membantu memahami konsep otorisasi dan pengamanan aplikasi web di Django. Saya berdiskusi mengenai cara menyaring data sensitif di endpoint JSON, menyembunyikan tombol UI berdasarkan peran (roles), serta pentingnya validasi hak akses di sisi backend menggunakan request.user.
+Strategi prompting yang saya gunakan adalah menanyakan langsung poin spesifikasi tugas yang belum saya pahami, lalu meminta penjelasan lanjutan mengenai perbedaan proteksi di sisi template (HTML) dan backend (views.py). Gemini merespons dengan memberikan gambaran proteksi dua lapis: ibarat pintu gerbang (tampilan tombol) dan penjaga pintu utama (validasi backend yang mengembalikan HTTP 403 Forbidden).
+AI digunakan sebagai alat bantu untuk mempermudah pemahaman konsep otorisasi melalui penjelasan bertahap. Saya tetap mencerna dan menerapkan sendiri logika pemisahan hak akses pengguna (Pengunjung, Pengguna Biasa, Editor, Pemilik Portofolio) ke dalam kode tugas secara mandiri. Bukti percakapan dengan Gemini telah saya sertakan bersama tugas ini.
+
+Progress minggu ini tugas individu 4:
+- Mengimplementasikan fitur register, login, dan logout bawaan Django serta menampilkan status user dan cookie last_login
+- Membuat grup Editor via Django Admin dan menerapkan pembatasan hak akses untuk 4 peran (Pengunjung, User Biasa, Editor, Superuser)
+- Menerapkan pengamanan dua lapis: menyembunyikan tombol di template HTML dan memvalidasi hak akses di backend (HTTP 403 Forbidden)
+- Menambahkan relasi ManyToManyField pada model untuk fitur toggle star beserta penampil total jumlah star
+- Memastikan endpoint JSON aman dari kebocoran data sensitif seperti password hash
+- Melakukan pembaruan deployment ke PWS (Pacil Web Service)
+
+
+
+
+
+
 
 
 
