@@ -31,6 +31,10 @@
                             aria-label="Cari berdasarkan nama pencapaian">
                     <button type="submit" class="button">Cari</button>
                 </form>
+                <button class="button button-secondary"
+                    onclick="showToast('Notifikasi Sistem', 'Achievement berhasil dimuat!','success')">
+                    Test Toast Notifikasi
+                </button>
                 <div class = "experience-grid achievement-grid">
                     {% for achievement in achievement_list %}
                     <article class = "experience-card">
