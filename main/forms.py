@@ -1,5 +1,7 @@
 from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput
 from main.models import Achievement
+from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
 
 
 class AchievementForm(ModelForm):
@@ -48,3 +50,15 @@ class AchievementForm(ModelForm):
                 }
             ),
         }
+
+    def clean_title(self):
+        title = strip_tags(self.cleaned_data["title"]).strip()
+        if not title:
+            raise ValidationError("Nama pencapaian tidak boleh hanya berisi tag HTML.")
+        return title
+
+    def clean_description(self):
+        return strip_tags(self.cleaned_data["description"]).strip()
+
+    def clean_issuer(self):
+        return strip_tags(self.cleaned_data["issuer"]).strip()

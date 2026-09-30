@@ -83,6 +83,16 @@
                 gridContainer.classList.toggle('hide', !showGrid);
             }
 
+            // Mengubah karakter khusus HTML menjadi entity agar ditampilkan sebagai teks
+            function escapeHtml(value) {
+                return String(value ?? '')
+                    .replaceAll('&', '&amp;')
+                    .replaceAll('<', '&lt;')
+                    .replaceAll('>', '&gt;')
+                    .replaceAll('"', '&quot;')
+                    .replaceAll("'", '&#39;');
+            }
+
             // Membuat elemen card achievement
             function buildAchievementCardElement(item) {
                 const achievement = item.fields;
@@ -91,8 +101,8 @@
                 const articleElement = document.createElement('article');
                 articleElement.className = 'experience-card';
 
-                const imageHtml = achievement.credential_url 
-                    ? `<img src="${achievement.credential_url}" alt="Gambar ${achievement.title}" class="achievement-image">`
+               const imageHtml = achievement.credential_url 
+                    ? `<img src="${escapeHtml(achievement.credential_url)}" alt="Gambar ${escapeHtml(achievement.title)}" class="achievement-image">`
                     : '';
 
                 // Dummy ID digunakan untuk digantikan oleh ID asli dari data JSON
@@ -120,10 +130,10 @@
                 // Komponen card
                 const completeCardHtml = `
                     ${imageHtml}
-                    <h2>${achievement.title}</h2>
-                    <p class="experience-description">${achievement.description}</p>
-                    <p class="experience-description">Diberikan oleh ${achievement.issuer}</p>
-                    <p class="experience-status">${achievement.issued_at}</p>
+                    <h2>${escapeHtml(achievement.title)}</h2>
+                    <p class="experience-description">${escapeHtml(achievement.description)}</p>
+                    <p class="experience-description">Diberikan oleh ${escapeHtml(achievement.issuer)}</p>
+                    <p class="experience-status">${escapeHtml(achievement.issued_at)}</p>
                     <div class="achievement-actions">
                         <form method="post" action="${starUrl}" class="star-form">
                             {% csrf_token %}
