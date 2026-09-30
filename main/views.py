@@ -40,6 +40,7 @@ def show_achievement(request):
         "name": "Khansa Nathania Khairunnisa",
         "title_query": request.GET.get("title", "").strip(),
         "is_editor": is_editor,
+        "form": AchievementForm(),
     }
     return render(request,"achievement.html", context)
 
