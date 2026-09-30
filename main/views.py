@@ -1,4 +1,5 @@
 import datetime
+from django.http import JsonResponse
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -8,9 +9,6 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from main.models import Experience, Achievement
 from main.forms import AchievementForm
-from django.core import serializers
-from django.http import HttpResponse
-
 
 def show_main(request):
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
@@ -37,18 +35,9 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_achievement(request):
-    json_response = get_achievements_json(request)
-    achievements = serializers.deserialize(
-        "json", json_response.content.decode("utf-8")
-    )
-
-    achievement_list = [achievement.object for achievement in achievements]
-
     is_editor = request.user.groups.filter(name="Editor").exists()
-
     context = {
         "name": "Khansa Nathania Khairunnisa",
-        "achievement_list": achievement_list,
         "title_query": request.GET.get("title", "").strip(),
         "is_editor": is_editor,
     }
@@ -82,14 +71,37 @@ def create_achievement(request):
 
 def get_achievements_json(request):
     title_query = request.GET.get("title", "").strip()
-    achievements = Achievement.objects.all()
+    achievements = Achievement.objects.prefetch_related("starred_by").all()
 
     if title_query:
         achievements = achievements.filter(title__icontains=title_query)
 
-    # Membatasi field JSON agar data sensitif seperti starred_by tidak ikut terekspos
-    achievements_json = serializers.serialize("json", achievements, fields=["title", "description", "issuer", "issued_at", "credential_url"])
-    return HttpResponse(achievements_json, content_type="application/json")
+    # Konstruksi data JSON secara manual agar bisa menyisipkan logika Star
+    data = []
+
+    for achievement in achievements:
+        starred_users = achievement.starred_by.all()
+
+        is_starred = (
+            request.user in starred_users
+            if request.user.is_authenticated
+            else False
+        )
+
+        data.append({
+            "pk": str(achievement.id),
+            "fields": {
+                "title": achievement.title,
+                "description": achievement.description,
+                "issuer": achievement.issuer,
+                "issued_at": achievement.issued_at.isoformat(),
+                "credential_url": achievement.credential_url,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 
 @login_required(login_url="/login/")
