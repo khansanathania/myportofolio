@@ -1,5 +1,6 @@
 import datetime
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -69,6 +70,24 @@ def create_achievement(request):
         
     }
     return render(request, "achievement_form.html", context)
+
+@require_POST
+def create_achievement_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan pencapaian."},
+            status=403,
+        )
+
+    form = AchievementForm(request.POST)
+    if form.is_valid():
+        achievement = form.save()
+        return JsonResponse(
+            {"message": "Pencapaian berhasil ditambahkan.", "pk": str(achievement.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 def get_achievements_json(request):
     title_query = request.GET.get("title", "").strip()

@@ -13,6 +13,7 @@ from main.views import (
     login_user,
     logout_user,
     toggle_star,
+    create_achievement_ajax
 )
 
 app_name = "main"
@@ -30,6 +31,6 @@ urlpatterns = [
     path("register/", register, name="register"),
     path("login/", login_user, name="login"),
     path("logout/", logout_user, name="logout"),
-    path("achievement/<int:achievement_id>/star/", toggle_star, name="toggle_star",
-),
+    path("achievement/<int:achievement_id>/star/", toggle_star, name="toggle_star",),
+    path("achievement/add-ajax/", create_achievement_ajax, name="create_achievement_ajax"),
 ]
