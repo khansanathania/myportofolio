@@ -767,6 +767,10 @@ h1, .brand {
     margin-top: 0;
 }
 
+.achievement-actions + .button {
+    margin-top: 12px;
+}
+
 /* toast */
 .toast-component {
     position: fixed;
