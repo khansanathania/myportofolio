@@ -13,7 +13,11 @@ from main.views import (
     login_user,
     logout_user,
     toggle_star,
-    create_achievement_ajax
+    create_achievement_ajax,
+    show_skills,
+    get_skills_json,
+    create_skill_ajax,
+    toggle_skill_star,
 )
 
 app_name = "main"
@@ -33,4 +37,8 @@ urlpatterns = [
     path("logout/", logout_user, name="logout"),
     path("achievement/<int:achievement_id>/star/", toggle_star, name="toggle_star",),
     path("achievement/add-ajax/", create_achievement_ajax, name="create_achievement_ajax"),
+    path("skills/", show_skills, name="show_skills"),
+    path("api/skills/", get_skills_json, name="get_skills_json"),
+    path("skills/add-ajax/", create_skill_ajax, name="create_skill_ajax"),
+    path("skills/<int:skill_id>/star/", toggle_skill_star, name="toggle_skill_star"),
 ]

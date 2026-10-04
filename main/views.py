@@ -8,8 +8,8 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from main.models import Experience, Achievement
-from main.forms import AchievementForm
+from main.models import Experience, Achievement, Skill
+from main.forms import AchievementForm, SkillForm
 
 def show_main(request):
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
@@ -208,3 +208,81 @@ def toggle_star(request, achievement_id):
             achievement.starred_by.add(request.user)
 
     return redirect("main:show_achievement")
+
+def show_skills(request):
+    context = {
+        "name": "Khansa Nathania Khairunnisa",
+        "skill_query": request.GET.get("name", "").strip(),
+        "form": SkillForm(),
+    }
+    return render(request, "skills.html", context)
+
+
+def get_skills_json(request):
+    name_query = request.GET.get("name", "").strip()
+    skills = Skill.objects.prefetch_related("starred_by").all()
+
+    if name_query:
+        skills = skills.filter(name__icontains=name_query)
+
+    data = []
+    for skill in skills:
+        starred_users = skill.starred_by.all()
+        is_starred = (
+            request.user in starred_users
+            if request.user.is_authenticated
+            else False
+        )
+        data.append({
+            "pk": str(skill.id),
+            "fields": {
+                "name": skill.name,
+                "level": skill.level,
+                "star_count": len(starred_users),
+                "is_starred": is_starred,
+            },
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+@require_POST
+def create_skill_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan skill."},
+            status=403,
+        )
+
+    form = SkillForm(request.POST)
+    if form.is_valid():
+        skill = form.save()
+        return JsonResponse(
+            {"message": "Skill berhasil ditambahkan.", "pk": str(skill.id)},
+            status=201,
+        )
+
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
+
+@require_POST
+def toggle_skill_star(request, skill_id):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"message": "Silakan login untuk memberi star."},
+            status=401,
+        )
+
+    skill = get_object_or_404(Skill, pk=skill_id)
+
+    if skill.starred_by.filter(pk=request.user.pk).exists():
+        skill.starred_by.remove(request.user)
+        is_starred = False
+    else:
+        skill.starred_by.add(request.user)
+        is_starred = True
+
+    return JsonResponse({
+        "is_starred": is_starred,
+        "star_count": skill.starred_by.count(),
+    })
