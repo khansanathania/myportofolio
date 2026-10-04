@@ -1,6 +1,7 @@
 import uuid
 from django.contrib.auth.models import User
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Experience(models.Model):
     EXPERIENCE_CHOICES = [
@@ -38,3 +39,18 @@ class Achievement(models.Model):
         # untuk memnetukan tampilan teks
     def __str__(self):
         return f"{self.title} - {self.issuer}"
+    
+class Skill(models.Model):
+        name = models.CharField(max_length=100)
+        # Level 1-5, sesuai jumlah titik pada tampilan Skills
+        level = models.PositiveSmallIntegerField(
+            default=3,
+            validators=[MinValueValidator(1), MaxValueValidator(5)],
+        )
+        # Relasi star dari Tugas 4: satu pengguna maksimal satu star per skill
+        starred_by = models.ManyToManyField(
+            User, related_name="starred_skills", blank=True
+        )
+    
+        def __str__(self):
+            return f"{self.name} ({self.level}/5)"
