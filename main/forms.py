@@ -1,7 +1,8 @@
-from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput
-from main.models import Achievement
+from django.forms import ModelForm, TextInput, Textarea, URLInput, DateInput, NumberInput
+from main.models import Achievement, Skill
 from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
+
 
 
 class AchievementForm(ModelForm):
@@ -62,3 +63,22 @@ class AchievementForm(ModelForm):
 
     def clean_issuer(self):
         return strip_tags(self.cleaned_data["issuer"]).strip()
+    
+class SkillForm(ModelForm):
+    class Meta:
+        model = Skill
+        fields = ["name", "level"]
+        labels = {
+            "name": "Nama Skill",
+            "level": "Level (1-5)",
+        }
+        widgets = {
+            "name": TextInput(attrs={"placeholder": "Writing", "maxlength": 100}),
+            "level": NumberInput(attrs={"min": 1, "max": 5}),
+        }
+
+    def clean_name(self):
+        name = strip_tags(self.cleaned_data["name"]).strip()
+        if not name:
+            raise ValidationError("Nama skill tidak boleh hanya berisi tag HTML.")
+        return name
