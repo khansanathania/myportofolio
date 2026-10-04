@@ -767,6 +767,7 @@ h1, .brand {
     margin-top: 0;
 }
 
+/* untuk memberikan space antara tombol star dan edit */
 .achievement-actions + .button {
     margin-top: 12px;
 }
@@ -822,6 +823,17 @@ h1, .brand {
 
 .hide {
     display: none !important;
+}
+
+/* skills */
+.skill-dots {
+    font-size: 1.1rem;
+    letter-spacing: 0.3rem;
+    color: var(--accent);
+}
+
+.skill-dot--off {
+    opacity: 0.25;
 }
 
 
