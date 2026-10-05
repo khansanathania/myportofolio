@@ -265,6 +265,18 @@ def create_skill_ajax(request):
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 
+@login_required(login_url="/login/")
+@require_POST
+def delete_skill(request, skill_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    skill = get_object_or_404(Skill, pk=skill_id)
+    skill.delete()
+
+    return redirect("main:show_skills")
+
+
 @require_POST
 def toggle_skill_star(request, skill_id):
     if not request.user.is_authenticated:

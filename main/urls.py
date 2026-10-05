@@ -18,6 +18,7 @@ from main.views import (
     get_skills_json,
     create_skill_ajax,
     toggle_skill_star,
+    delete_skill,
 )
 
 app_name = "main"
@@ -41,4 +42,5 @@ urlpatterns = [
     path("api/skills/", get_skills_json, name="get_skills_json"),
     path("skills/add-ajax/", create_skill_ajax, name="create_skill_ajax"),
     path("skills/<int:skill_id>/star/", toggle_skill_star, name="toggle_skill_star"),
+    path("skills/<int:skill_id>/delete/", delete_skill, name="delete_skill"),
 ]
