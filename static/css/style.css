@@ -753,14 +753,19 @@ h1, .brand {
 
 .achievement-actions {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
+    gap: 10px;
 }
 
-.achievement-actions > * {
+.achievement-actions .button-secondary {
+    margin-top: 6px;
+}
+
+.achievement-actions > form {
     margin-top: 0;
+    flex-basis: 100%;
+
 }
 
 .achievement-actions .experience-status {
@@ -836,15 +841,35 @@ h1, .brand {
     opacity: 0.25;
 }
 
+.skill-grid .experience-card {
+    display: flex;
+    flex-direction: column;
+}
 
+.skill-grid .skill-dots {
+    margin-bottom: 1rem;
+}
 
+.skill-grid .skill-actions {
+    margin-top: auto;
+}
 
+.skill-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: auto;
+}
 
+.skill-actions .button-star,
+.skill-actions .button-secondary,
+.skill-actions .button-danger {
+    width: auto;
+}
 
-
-
-    
-
-
-
-   
+.skill-actions > form {
+    width: auto;
+    margin-top: 0;
+    flex-basis: auto;
+}
