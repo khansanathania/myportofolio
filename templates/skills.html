@@ -64,6 +64,9 @@
         const CREATE_SKILL_ENDPOINT = "{% url 'main:create_skill_ajax' %}";
         const STAR_URL_TEMPLATE = "{% url 'main:toggle_skill_star' 0 %}";
         const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
+        const IS_EDITOR = "{{ is_editor|yesno:'true,false' }}" === "true";
+        const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+
 
         const SEARCH_DEBOUNCE_DELAY = 300;
         let skillsAbortController;
@@ -124,6 +127,14 @@
         function buildSkillCardElement(item) {
             const skill = item.fields;
             const skillId = item.pk;
+            const editUrl = "{% url 'main:update_skill' 0 %}"
+                .replace('/0/', `/${skillId}/`);
+
+            const editHtml = (IS_SUPERUSER || IS_EDITOR)
+                ? `<a href="${editUrl}" class="button button-secondary">
+                        Edit
+                </a>`
+                : '';
             const deleteUrl = "{% url 'main:delete_skill' 0 %}"
                .replace('/0/', `/${skillId}/`);
 
@@ -147,7 +158,7 @@
             articleElement.innerHTML = `
                 <h2>${escapeHtml(skill.name)}</h2>
                 <p class="skill-dots" aria-label="Level ${escapeHtml(skill.level)} dari 5">${buildDotsHtml(skill.level)}</p>
-                <div class="achievement-actions">
+                <div class="achievement-actions skill-actions">
                     <button type="button"
                             class="button button-star skill-star-btn${isStarredClass}"
                             data-id="${escapeHtml(item.pk)}">
@@ -155,6 +166,7 @@
                         <span class="skill-star-text">${starText}</span>
                         <span class="star-count">${escapeHtml(skill.star_count)}</span>
                     </button>
+                    ${editHtml}
                     ${deleteHtml}
                 </div>
             `;
@@ -216,6 +228,10 @@
 
         // Star / unstar lewat AJAX
         async function toggleSkillStar(button) {
+            if (!IS_AUTHENTICATED) {
+                window.location.href = "{% url 'main:login' %}";
+                return;
+            }
             const url = STAR_URL_TEMPLATE.replace('/0/', `/${button.dataset.id}/`);
             button.disabled = true;
 
