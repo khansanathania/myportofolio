@@ -83,6 +83,43 @@ Progress minggu ini tugas individu 4:
 - Memastikan endpoint JSON aman dari kebocoran data sensitif seperti password hash
 - Melakukan pembaruan deployment ke PWS (Pacil Web Service)
 
+### Tugas 5
+1. Debouncing
+*Debouncing* adalah teknik untuk **menunda menjalankan suatu fungsi sampai pengguna berhenti melakukan sesuatu selama waktu tertentu**. Dalam fitur pencarian menggunakan AJAX, misalnya pengguna mengetik `a`, `ap`, `app`, `appl`, lalu `apple`. Tanpa *debouncing*, setiap kali satu huruf diketik, browser akan langsung mengirim request AJAX ke server. Hal ini bisa membuat request terlalu banyak dan membebani server. Dengan *debouncing*, sistem akan menunggu misalnya 300 ms setelah pengguna berhenti mengetik, baru kemudian mengirim request. Jadi, *debouncing* digunakan agar **request AJAX tidak dilakukan berkali-kali ketika pengguna masih mengetik**, sehingga pencarian lebih efisien dan tidak membebani server.
+
+2. `await` pada `fetch()`
+`fetch()` digunakan untuk mengambil data dari server, tetapi proses tersebut membutuhkan waktu sehingga berjalan secara *asynchronous*. `await` digunakan untuk **menunggu sampai `fetch()` selesai mendapatkan response dari server sebelum program melanjutkan ke baris berikutnya**. Jadi, misalnya saya menulis `const response = await fetch("/search/")`, program akan menunggu sampai response diterima terlebih dahulu. Jika tidak menggunakan `await`, variabel `response` belum berisi hasil dari server, tetapi masih berupa **Promise**, yaitu tanda bahwa hasilnya belum tersedia. Akibatnya, kita tidak bisa langsung menggunakan response tersebut sebagai data yang sudah diterima. Jadi, sederhananya, **`await` membuat pengguna menunggu hasil `fetch()` sebelum menggunakan hasilnya**.
+
+3. XSS (*Cross-Site Scripting*)
+XSS adalah serangan ketika seseorang memasukkan **kode JavaScript atau HTML berbahaya ke dalam data yang kemudian ditampilkan di halaman web**, sehingga kode tersebut dapat dijalankan oleh browser pengguna. Pada AJAX, data dari server biasanya diterima oleh JavaScript lalu dimasukkan ke halaman secara langsung. Jika kita memasukkannya menggunakan `innerHTML`, misalnya, data yang sebenarnya hanya berupa teks dapat dianggap sebagai HTML dan berpotensi menjalankan kode berbahaya. Sementara itu, ketika menggunakan template Django seperti `{{ name }}`, Django secara default melakukan **escaping** terhadap karakter HTML sehingga data seperti `<script>` tidak langsung dianggap sebagai kode. Jadi, data AJAX/JavaScript perlu lebih diperhatikan karena **kita sendiri yang mengatur bagaimana data tersebut dimasukkan ke halaman**, sedangkan template Django sudah memiliki perlindungan *auto-escaping* secara default.
+
+
+Penggunaan AI
+
+https://share.gemini.google/DIrn8KIWCAoW
+
+Dalam pengerjaan tugas ini, saya menggunakan Gemini untuk membantu memahami konsep AJAX, khususnya mengenai proses pengambilan data dari endpoint menggunakan fetch(). Saya berdiskusi mengenai pengertian endpoint dan fetch(), alur request dari browser ke server, response yang diberikan oleh server, serta proses mengubah response menjadi data JSON yang dapat digunakan oleh JavaScript pada halaman web.
+Selain itu, saya menggunakan Gemini untuk memahami fungsi {% csrf_token %} dalam Django. Pembahasan mencakup cara token CSRF dibuat oleh Django, bagaimana token tersebut dikirim kembali ketika form melakukan POST, serta bagaimana Django memvalidasi token untuk mencegah serangan Cross-Site Request Forgery (CSRF) dan mengembalikan HTTP 403 Forbidden apabila token tidak sesuai atau tidak tersedia.
+Strategi prompting yang saya gunakan adalah menanyakan secara langsung konsep dan fungsi bagian kode yang belum saya pahami, kemudian meminta penjelasan mengenai komponen dan alur kerjanya. Gemini memberikan penjelasan bertahap mengenai hubungan antara endpoint, fetch(), request, response, JSON, serta mekanisme kerja {% csrf_token %} pada form Django.
+AI digunakan sebagai alat bantu untuk mempermudah pemahaman konsep AJAX, Fetch API, JSON, dan CSRF. Saya tetap memahami dan menerapkan konsep tersebut secara mandiri dalam implementasi Tugas Individu 5 pada bagian Skills, termasuk proses pengambilan data dari endpoint menggunakan fetch(), pengolahan response JSON, serta penggunaan token CSRF dalam permintaan POST. Bukti percakapan dengan Gemini telah saya sertakan bersama tugas ini.
+
+
+**Progress minggu ini tugas individu 5:**
+
+1. Mengimplementasikan penampilan data Skills menggunakan AJAX dan Fetch API dengan endpoint JSON yang dikonstruksi secara manual, termasuk level, jumlah *star*, dan status *star* pengguna
+2. Menerapkan fitur pencarian Skills menggunakan AJAX tanpa *reload* halaman serta *search debouncing* agar request hanya dikirim setelah pengguna berhenti mengetik
+3. Membuat modal form untuk menambahkan Skill dan mengimplementasikan penambahan data melalui AJAX dengan validasi `ModelForm`, CSRF protection, serta penanganan response HTTP 201, 400, dan 403
+4. Menambahkan *loading state*, *empty state*, dan *error state* serta notifikasi *toast* untuk memberikan feedback pada proses AJAX
+5. Menerapkan perlindungan XSS dengan melakukan *escaping* pada data yang ditampilkan melalui JavaScript menggunakan `escapeHtml()` serta membersihkan input pada sisi server menggunakan `strip_tags()` di `SkillForm`
+6. Mempertahankan dan menerapkan hak akses dari Tugas 4 pada bagian Skills untuk empat peran, yaitu Pengunjung, User Biasa, Editor, dan Superuser, dengan pembatasan akses terhadap fitur Star, Add, Edit, dan Delete
+7. Melakukan pengujian fitur Skills pada berbagai peran pengguna, validasi input, response authorization, serta perlindungan terhadap serangan XSS
+8. Melakukan pembaruan *deployment* proyek ke **PWS (Pacil Web Service)** 
+
+
+
+
+
+
 
 
 
