@@ -210,10 +210,13 @@ def toggle_star(request, achievement_id):
     return redirect("main:show_achievement")
 
 def show_skills(request):
+    is_editor = request.user.groups.filter(name="Editor").exists()
     context = {
         "name": "Khansa Nathania Khairunnisa",
         "skill_query": request.GET.get("name", "").strip(),
         "form": SkillForm(),
+        "is_editor": is_editor,
+
     }
     return render(request, "skills.html", context)
 
@@ -264,6 +267,29 @@ def create_skill_ajax(request):
 
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
+
+@login_required(login_url="/login/")
+def update_skill(request, skill_id):
+    if not (
+        request.user.is_superuser
+        or request.user.groups.filter(name="Editor").exists()
+    ):
+        raise PermissionDenied
+
+    skill = get_object_or_404(Skill, pk=skill_id)
+    form = SkillForm(request.POST or None, instance=skill)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Skill berhasil diperbaharui!")
+        return redirect("main:show_skills")
+
+    context = {
+        "name": "Khansa Nathania Khairunnisa",
+        "form": form,
+        "skill": skill,
+    }
+    return render(request, "skill_form.html", context)
 
 @login_required(login_url="/login/")
 @require_POST
