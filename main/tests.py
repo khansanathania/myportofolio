@@ -1,3 +1,4 @@
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -19,11 +20,13 @@ class MainTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "index.html")
         self.assertNotContains(response, self.experience.title)
-        self.assertContains(response, f'href="{reverse("main:show_experience")}"')
+        self.assertContains(
+            response,
+            f'href="{reverse("main:show_experience")}"'
+        )
 
     def test_nonexistent_page_returns_404(self):
         response = self.client.get("/halaman-yang-tidak-ada/")
-
         self.assertEqual(response.status_code, 404)
 
     def test_experience_model(self):
@@ -40,22 +43,31 @@ class MainTest(TestCase):
         self.assertContains(response, self.experience.description)
         self.assertContains(response, "Part-Time")
         self.assertContains(response, "Sedang berlangsung")
-        self.assertContains(response, f'href="{reverse("main:show_main")}"')
+        self.assertContains(
+            response,
+            f'href="{reverse("main:show_main")}"'
+        )
 
     def test_empty_experience_page(self):
         Experience.objects.all().delete()
+
         response = self.client.get(reverse("main:show_experience"))
 
-        self.assertContains(response, "Belum ada pengalaman yang ditambahkan.")
+        self.assertContains(
+            response,
+            "Belum ada pengalaman yang ditambahkan."
+        )
 
     def test_completed_experience(self):
         self.experience.ended_at = timezone.now()
         self.experience.save()
+
         response = self.client.get(reverse("main:show_experience"))
 
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
+
 
 class AchievementTest(TestCase):
     def setUp(self):
@@ -68,29 +80,76 @@ class AchievementTest(TestCase):
 
     def test_achievement_url_is_accessible(self):
         response = self.client.get(reverse("main:show_achievement"))
+
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "achievement.html")
 
     def test_achievement_page_shows_data(self):
         response = self.client.get(reverse("main:show_achievement"))
-        self.assertContains(response, self.achievement.title)
-        self.assertContains(response, self.achievement.issuer)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="grid"')
+
+        api_response = self.client.get(
+            reverse("api:achievement-list")
+        )
+
+        self.assertEqual(api_response.status_code, 200)
+
+        achievements = api_response.json()
+
+        titles = [
+            achievement["title"]
+            for achievement in achievements
+        ]
+
+        issuers = [
+            achievement["issuer"]
+            for achievement in achievements
+        ]
+
+        self.assertIn(self.achievement.title, titles)
+        self.assertIn(self.achievement.issuer, issuers)
 
     def test_empty_achievement_page(self):
         Achievement.objects.all().delete()
+
         response = self.client.get(reverse("main:show_achievement"))
-        self.assertContains(response, "Belum ada pencapaian yang ditambahkan.")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Belum ada pencapaian yang ditambahkan atau ditemukan."
+        )
+
+        api_response = self.client.get(
+            reverse("api:achievement-list")
+        )
+
+        self.assertEqual(api_response.status_code, 200)
+        self.assertEqual(api_response.json(), [])
 
     def test_achievement_detail_url_is_accessible(self):
         response = self.client.get(
-            reverse("main:show_achievement_detail", args=[self.achievement.id])
+            reverse(
+                "main:show_achievement_detail",
+                args=[self.achievement.id]
+            )
         )
+
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "achievement_detail.html")
+        self.assertTemplateUsed(
+            response,
+            "achievement_detail.html"
+        )
         self.assertContains(response, self.achievement.title)
 
     def test_achievement_detail_returns_404_if_not_found(self):
         response = self.client.get(
-            reverse("main:show_achievement_detail", args=[9999])
+            reverse(
+                "main:show_achievement_detail",
+                args=[9999]
+            )
         )
+
         self.assertEqual(response.status_code, 404)
