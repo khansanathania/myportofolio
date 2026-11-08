@@ -1,0 +1,53 @@
+<!--
+Modal edit Skill menggunakan HTML Popover API.
+Modal ini hanya ditampilkan untuk Superuser dan Editor.
+-->
+<div id="edit-skill-modal"
+     class="project-form-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="edit-skill-modal-title">
+
+    <!-- Latar gelap di belakang modal; kalau diklik, modal tertutup -->
+    <button type="button"
+            class="project-form-modal__backdrop"
+            popovertarget="edit-skill-modal"
+            popovertargetaction="hide"
+            aria-label="Tutup form edit skill"></button>
+
+    <div class="project-form-modal__content">
+        <!-- Tombol silang di pojok kanan atas -->
+        <button type="button"
+                class="project-form-modal__close"
+                popovertarget="edit-skill-modal"
+                popovertargetaction="hide"
+                aria-label="Tutup form edit skill">×</button>
+
+        <h2 id="edit-skill-modal-title">Edit Skill</h2>
+
+        <!-- Form ini TIDAK punya action dan method. Pengirimannya diambil alih
+             oleh JavaScript (fungsi saveSkill) yang memakai fetch PATCH ke API DRF.
+             Token CSRF dikirim lewat header X-CSRFToken, jadi tidak perlu {% csrf_token %} di sini. -->
+        <form id="skill-edit-form" class="project-form">
+            <div class="form-group">
+                <label for="edit-skill-name">Nama Skill</label>
+                <!-- Nilainya diisi JavaScript saat tombol Edit diklik (openEditModal) -->
+                <input type="text" id="edit-skill-name" name="name" maxlength="100" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-skill-level">Level (1-5)</label>
+                <!-- min/max hanya validasi di browser; validasi sebenarnya ada di serializer -->
+                <input type="number" id="edit-skill-level" name="level" min="1" max="5" required>
+            </div>
+            <div class="project-form-modal__actions">
+                <!-- Tombol Batal menutup modal tanpa mengirim apa pun -->
+                <button type="button"
+                        class="button button-secondary"
+                        popovertarget="edit-skill-modal"
+                        popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
