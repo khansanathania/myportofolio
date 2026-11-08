@@ -850,26 +850,22 @@ h1, .brand {
     margin-bottom: 1rem;
 }
 
-.skill-grid .skill-actions {
-    margin-top: auto;
-}
-
+/* tombol star, edit, dan hapus berjajar dalam satu baris */
 .skill-actions {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
     margin-top: auto;
 }
 
-.skill-actions .button-star,
-.skill-actions .button-secondary,
-.skill-actions .button-danger {
-    width: auto;
+.skill-actions .button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    margin-top: 0;
 }
 
 .skill-actions > form {
-    width: auto;
-    margin-top: 0;
-    flex-basis: auto;
+    margin: 0;
 }
