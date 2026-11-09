@@ -119,12 +119,12 @@ AI digunakan sebagai alat bantu untuk mempermudah pemahaman konsep AJAX, Fetch A
 ### Tugas 6
 
 #### 1. Apa yang dimaksud dengan REST dan mengapa JSON saja belum cukup untuk membuat API RESTful? Apa perbedaan PUT dan PATCH?
+REST (*Representational State Transfer*) merupakan salah satu cara untuk merancang API agar frontend dan backend dapat saling berkomunikasi. Dalam REST, setiap data dapat diakses melalui URL tertentu dengan menggunakan metode HTTP, seperti GET untuk mengambil data, POST untuk menambahkan data, dan DELETE untuk menghapus data.
 
-REST merupakan salah satu cara untuk membuat API agar frontend dan backend bisa saling berkomunikasi. Dalam REST, data biasanya diakses melalui URL tertentu dan menggunakan metode HTTP sesuai kebutuhan. Contohnya, GET digunakan untuk mengambil data, POST untuk menambahkan data, dan DELETE untuk menghapus data.
+API yang mengembalikan JSON belum tentu disebut RESTful karena JSON hanya merupakan format untuk mengirim data. Agar disebut RESTful, API juga perlu menggunakan metode HTTP sesuai fungsinya, memiliki URL yang jelas, serta memberikan status HTTP yang sesuai. Contohnya, ketika data berhasil ditambahkan, API memberikan status 201, sedangkan jika data tidak ditemukan, API memberikan status 404.
 
-Menurut saya, penggunaan JSON saja belum berarti sebuah API sudah RESTful, karena JSON hanya digunakan sebagai format untuk mengirim data. API juga harus menggunakan metode HTTP dengan benar, memiliki URL yang jelas untuk setiap resource, dan memberikan status response yang sesuai dengan hasil permintaan.
+PUT dan PATCH sama-sama digunakan untuk memperbarui data, tetapi penggunaannya berbeda. PUT digunakan untuk mengganti seluruh data, sedangkan PATCH hanya mengubah bagian tertentu saja. Misalnya, terdapat Skill Python dengan level 3. Jika ingin mengganti nama Skill menjadi Java sekaligus mengubah levelnya menjadi 4, saya dapat menggunakan PUT. Namun, jika hanya ingin menaikkan level Python dari 3 menjadi 4 tanpa mengganti namanya, saya dapat menggunakan PATCH karena hanya bagian level yang perlu diperbarui.
 
-Untuk PUT dan PATCH, keduanya sama-sama digunakan untuk memperbarui data, tetapi cara kerjanya berbeda. PUT biasanya digunakan untuk mengganti seluruh data pada suatu resource, sedangkan PATCH cukup mengubah bagian tertentu saja. Contohnya, ketika saya ingin memperbarui seluruh data Skill, saya bisa menggunakan PUT dengan mengirim nama dan level Skill sekaligus. Sementara itu, jika saya hanya ingin mengubah nama Skill tanpa mengubah levelnya, saya bisa menggunakan PATCH dengan mengirim nama Skill yang baru saja.
 #### 2. Apa fungsi serializer dalam Django REST Framework dan apa kelebihannya dibandingkan JsonResponse?
 
 Serializer digunakan untuk mengubah data dari model Django menjadi format yang bisa dikirim melalui API, misalnya JSON. Selain itu, serializer juga bisa digunakan untuk memeriksa apakah data yang dikirim pengguna sudah sesuai sebelum disimpan ke database.
