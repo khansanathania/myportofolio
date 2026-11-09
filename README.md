@@ -111,13 +111,63 @@ AI digunakan sebagai alat bantu untuk mempermudah pemahaman konsep AJAX, Fetch A
 3. Membuat modal form untuk menambahkan Skill dan mengimplementasikan penambahan data melalui AJAX dengan validasi `ModelForm`, CSRF protection, serta penanganan response HTTP 201, 400, dan 403
 4. Menambahkan *loading state*, *empty state*, dan *error state* serta notifikasi *toast* untuk memberikan feedback pada proses AJAX
 5. Menerapkan perlindungan XSS dengan melakukan *escaping* pada data yang ditampilkan melalui JavaScript menggunakan `escapeHtml()` serta membersihkan input pada sisi server menggunakan `strip_tags()` di `SkillForm`
-6. Mempertahankan dan menerapkan hak akses dari Tugas 4 pada bagian Skills untuk empat peran, yaitu Pengunjung, User Biasa, Editor, dan Superuser, dengan pembatasan akses terhadap fitur Star, Add, Edit, dan Delete
+6. Mempertahankan dan menerapkan hak akses dari Tugas 4 pada bagian Skills untuk empat peran, yaitu Guest, User Biasa, Editor, dan Superuser, dengan pembatasan akses terhadap fitur Star, Add, Edit, dan Delete
 7. Melakukan pengujian fitur Skills pada berbagai peran pengguna, validasi input, response authorization, serta perlindungan terhadap serangan XSS
 8. Melakukan pembaruan *deployment* proyek ke **PWS (Pacil Web Service)** 
 
 
+### Tugas 6
 
+#### 1. Apa yang dimaksud dengan REST dan mengapa JSON saja belum cukup untuk membuat API RESTful? Apa perbedaan PUT dan PATCH?
 
+REST merupakan salah satu cara untuk membuat API agar frontend dan backend bisa saling berkomunikasi. Dalam REST, data biasanya diakses melalui URL tertentu dan menggunakan metode HTTP sesuai kebutuhan. Contohnya, GET digunakan untuk mengambil data, POST untuk menambahkan data, dan DELETE untuk menghapus data.
+
+Menurut saya, penggunaan JSON saja belum berarti sebuah API sudah RESTful, karena JSON hanya digunakan sebagai format untuk mengirim data. API juga harus menggunakan metode HTTP dengan benar, memiliki URL yang jelas untuk setiap resource, dan memberikan status response yang sesuai dengan hasil permintaan.
+
+Untuk PUT dan PATCH, keduanya sama-sama digunakan untuk memperbarui data, tetapi cara kerjanya berbeda. PUT biasanya digunakan untuk mengganti seluruh data pada suatu resource, sedangkan PATCH cukup mengubah bagian tertentu saja. Contohnya, ketika saya ingin memperbarui seluruh data Skill, saya bisa menggunakan PUT dengan mengirim nama dan level Skill sekaligus. Sementara itu, jika saya hanya ingin mengubah nama Skill tanpa mengubah levelnya, saya bisa menggunakan PATCH dengan mengirim nama Skill yang baru saja.
+#### 2. Apa fungsi serializer dalam Django REST Framework dan apa kelebihannya dibandingkan JsonResponse?
+
+Serializer digunakan untuk mengubah data dari model Django menjadi format yang bisa dikirim melalui API, misalnya JSON. Selain itu, serializer juga bisa digunakan untuk memeriksa apakah data yang dikirim pengguna sudah sesuai sebelum disimpan ke database.
+
+Pada Tugas 6, saya membuat `SkillSerializer` untuk mengatur data Skills yang dikirim melalui API. Di dalamnya, saya menentukan field seperti `name`, `level`, `star_count`, dan `is_starred`. Saya juga menggunakan `strip_tags()` agar tag HTML yang dimasukkan pada nama Skill tidak ikut tersimpan.
+
+Menurut saya, penggunaan serializer lebih praktis dibandingkan `JsonResponse`, terutama ketika API sudah memiliki fitur tambah dan edit data. Kalau menggunakan `JsonResponse`, kita perlu menyiapkan data dan validasinya secara manual. Sementara itu, serializer sudah menyediakan cara yang lebih mudah untuk mengatur field dan melakukan validasi.
+
+#### 3. Apa perbedaan autentikasi dan otorisasi? Mengapa permission perlu diterapkan di server?
+
+Autentikasi dan otorisasi sebenarnya memiliki fungsi yang berbeda. Autentikasi digunakan untuk memastikan siapa pengguna yang sedang mengakses website, misalnya dengan melakukan login. Setelah pengguna berhasil dikenali, barulah otorisasi digunakan untuk menentukan fitur apa saja yang boleh diakses oleh pengguna tersebut.
+
+Pada fitur Skills yang saya kerjakan, terdapat empat peran pengguna. Guest hanya dapat melihat Skills, User Biasa dapat melihat dan memberikan Star, Editor dapat melihat serta mengedit Skills, sedangkan Superuser memiliki akses untuk menambahkan, mengedit, dan menghapus Skills.
+
+Permission harus diterapkan di server karena menyembunyikan tombol di halaman website saja belum cukup untuk membatasi akses. Misalnya, meskipun tombol Delete tidak terlihat oleh User Biasa, pengguna tersebut masih bisa mencoba mengakses API Delete secara langsung. Oleh karena itu, backend tetap harus memeriksa hak akses sebelum menjalankan permintaan agar pengguna tidak bisa melakukan tindakan di luar izin yang diberikan.
+
+#### 4. Mengapa SessionAuthentication masih memerlukan CSRF token dan mengapa force_authenticate belum cukup untuk menguji perlindungan CSRF?
+
+`SessionAuthentication` digunakan agar Django REST Framework bisa mengenali pengguna yang sudah login melalui session. Namun, penggunaan session saja belum cukup untuk melindungi permintaan yang mengubah data, karena browser dapat mengirim cookie secara otomatis. Oleh karena itu, CSRF token tetap diperlukan untuk membantu memastikan bahwa permintaan tersebut berasal dari halaman yang memang diperbolehkan.
+
+Penggunaan `force_authenticate()` juga belum cukup untuk menguji perlindungan CSRF karena cara ini langsung membuat pengguna dianggap sudah terautentikasi saat testing, tanpa melalui proses login menggunakan session seperti pada website sebenarnya.
+
+Pada Tugas 6, saya menggunakan `APIClient(enforce_csrf_checks=True)` dan `.login()` untuk menguji CSRF dengan lebih sesuai. Pengujian dilakukan untuk memastikan bahwa permintaan yang mengubah data tanpa CSRF token akan ditolak, sedangkan permintaan dengan token yang valid bisa diproses.
+
+#### AI Disclosure
+
+https://share.gemini.google/ZoDGv8sQHLpj
+
+Dalam pengerjaan tugas ini, saya menggunakan Gemini untuk membantu memahami dan menyusun implementasi Django REST Framework (DRF), khususnya mengenai cara membuat ModelSerializer dengan fields secara eksplisit, menambahkan field read-only untuk menghitung jumlah star dan status star pengguna yang sedang login (star_count dan is_starred), serta menyaring data sensitif agar tidak terekspos.
+Selain itu, saya berdiskusi mengenai penulisan fungsi JavaScript fetch() untuk melakukan request asinkron (GET, POST untuk tambah data dan star, PUT/PATCH untuk edit data, serta DELETE) ke endpoint DRF, termasuk cara mengambil token CSRF dari cookie menggunakan fungsi bantuan getCookie serta menyertakan header X-CSRFToken pada permintaan yang mengubah data.
+AI digunakan sebagai alat bantu untuk memahami konsep dan struktur kode DRF serta integrasi API. Saya tetap memahami dan menerapkan seluruh materi tersebut secara mandiri ke dalam implementasi tugas individu pada portofolio pribadi saya.
+
+**Progress minggu ini tugas individu 6:**
+
+1. Mengimplementasikan Django REST Framework (DRF) pada fitur Skills dengan membuat `SkillSerializer` untuk mengatur data yang dikirim dan diterima melalui API, termasuk validasi input dan pembersihan tag HTML menggunakan `strip_tags()`.
+2. Membuat endpoint REST API untuk fitur Skills yang mendukung operasi GET, POST, PUT, PATCH, dan DELETE, serta endpoint khusus untuk memberikan dan membatalkan Star.
+3. Menerapkan hak akses API untuk empat peran pengguna, yaitu Guest, User Biasa, Editor, dan Superuser. Setiap peran memiliki izin yang berbeda untuk melihat, menambahkan, mengedit, menghapus, dan memberikan Star pada Skills.
+4. Mengubah implementasi AJAX pada halaman Skills agar menggunakan endpoint DRF, termasuk fitur pencarian, penambahan, pengeditan, penghapusan, serta Star/Unstar tanpa perlu melakukan *reload* halaman.
+5. Menambahkan modal Edit Skill dan memperbaiki tampilan kartu Skills menggunakan CSS agar tombol Star, Edit, dan Delete tersusun lebih rapi.
+6. Menerapkan CSRF protection, validasi input, dan penanganan response HTTP pada proses pengiriman data melalui AJAX.
+7. Menambahkan automated testing menggunakan `APITestCase` untuk menguji operasi CRUD, hak akses pengguna, validasi input, Star/Unstar, dan perlindungan CSRF. Seluruh 38 test pada aplikasi `main` berhasil dijalankan.
+8. Membuat commit terpisah untuk implementasi backend, frontend, automated testing, dan perbaikan CSS, kemudian melakukan push ke GitHub melalui branch `feat/skills-drf`.
+9. Melakukan pembaruan *deployment* proyek ke **PWS (Pacil Web Service)** 
 
 
 

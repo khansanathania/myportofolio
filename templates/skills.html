@@ -19,7 +19,6 @@
                         Tambah Skill
                     </button>
                     {% endif %}
-
                 </div>
 
                 <form id="skill-search-form" class="project-search">
@@ -57,20 +56,24 @@
     {% if user.is_superuser %}
         {% include "components/skill_form_modal.html" %}
     {% endif %}
+    {% if user.is_superuser or is_editor %}
+        {% include "components/skill_edit_modal.html" %}
+    {% endif %}
 
+    {# Memastikan cookie csrftoken selalu dibuat, termasuk untuk pengguna biasa dan Editor #}
+    {% csrf_token %}
     <script>
-        // Konfigurasi
-        const BASE_SKILLS_ENDPOINT = "{% url 'main:get_skills_json' %}";
-        const CREATE_SKILL_ENDPOINT = "{% url 'main:create_skill_ajax' %}";
-        const STAR_URL_TEMPLATE = "{% url 'main:toggle_skill_star' 0 %}";
+        // Konfigurasi endpoint API (DRF)
+        const BASE_SKILLS_ENDPOINT = "{% url 'api:skill-list' %}";
+        const DETAIL_SKILL_ENDPOINT = "{% url 'api:skill-detail' 0 %}";
+        const STAR_SKILL_ENDPOINT = "{% url 'api:skill-star' 0 %}";
         const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
         const IS_EDITOR = "{{ is_editor|yesno:'true,false' }}" === "true";
         const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
-
-
         const SEARCH_DEBOUNCE_DELAY = 300;
         let skillsAbortController;
         let searchDebounceTimer;
+        let editingSkillId = null;
 
         // Elemen DOM
         const loadingState = document.getElementById('loading');
@@ -80,6 +83,7 @@
         const searchForm = document.getElementById('skill-search-form');
         const searchInput = document.getElementById('search-input');
         const skillForm = document.getElementById('skill-form');
+        const editForm = document.getElementById('skill-edit-form');
 
         // Menyembunyikan/menampilkan bagian halaman
         function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
@@ -99,20 +103,17 @@
                 .replaceAll("'", '&#39;');
         }
 
-        // Membaca nilai cookie, digunakan untuk mengambil token CSRF
+        // Membaca nilai cookie, dipakai untuk token CSRF
         function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
+            const prefix = `${name}=`;
+            const cookie = document.cookie.split(';').map(value => value.trim())
+                .find(value => value.startsWith(prefix));
+            return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : null;
+        }
+
+        // Mengganti angka 0 pada pola URL dengan ID skill yang sebenarnya
+        function skillEndpoint(pattern, id) {
+            return pattern.replace('/0/', `/${id}/`);
         }
 
         // Membuat deretan titik level (1-5)
@@ -123,57 +124,50 @@
             ).join('');
         }
 
-        // Membuat elemen card skill
-        function buildSkillCardElement(item) {
-            const skill = item.fields;
-            const skillId = item.pk;
-            const editUrl = "{% url 'main:update_skill' 0 %}"
-                .replace('/0/', `/${skillId}/`);
+        // Membuat elemen card skill dari objek JSON API
+        function buildSkillCardElement(skill) {
+            const article = document.createElement('article');
+            article.className = 'experience-card';
+
+            const starHtml = IS_AUTHENTICATED
+                ? `<button type="button"
+                           class="button button-star${skill.is_starred ? ' is-starred' : ''}"
+                           data-action="star" data-id="${escapeHtml(skill.id)}">
+                        <span aria-hidden="true">★</span>
+                        ${skill.is_starred ? 'Unstar' : 'Star'}
+                        <span class="star-count">${escapeHtml(skill.star_count)}</span>
+                   </button>`
+                : `<a href="{% url 'main:login' %}" class="button button-star">
+                        <span aria-hidden="true">★</span>
+                        Login untuk star
+                        <span class="star-count">${escapeHtml(skill.star_count)}</span>
+                   </a>`;
 
             const editHtml = (IS_SUPERUSER || IS_EDITOR)
-                ? `<a href="${editUrl}" class="button button-secondary">
-                        Edit
-                </a>`
+                ? `<button type="button" class="button button-secondary"
+                           data-action="edit" data-id="${escapeHtml(skill.id)}"
+                           data-name="${escapeHtml(skill.name)}"
+                           data-level="${escapeHtml(skill.level)}">Edit</button>`
                 : '';
-            const deleteUrl = "{% url 'main:delete_skill' 0 %}"
-               .replace('/0/', `/${skillId}/`);
 
             const deleteHtml = IS_SUPERUSER
-                ? `<form method="post"
-                        action="${deleteUrl}"
-                        style="display:inline;"
-                        onsubmit="return confirm('Yakin ingin menghapus skill ini?');">
-                        {% csrf_token %}
-                        <button type="submit" class="button button-danger">
-                            Hapus
-                        </button>
-                    </form>`
+                ? `<button type="button" class="button button-danger"
+                           data-action="delete" data-id="${escapeHtml(skill.id)}">Hapus</button>`
                 : '';
-            const articleElement = document.createElement('article');
-            articleElement.className = 'experience-card';
 
-            const isStarredClass = skill.is_starred ? ' is-starred' : '';
-            const starText = skill.is_starred ? 'Unstar' : 'Star';
-
-            articleElement.innerHTML = `
+            article.innerHTML = `
                 <h2>${escapeHtml(skill.name)}</h2>
                 <p class="skill-dots" aria-label="Level ${escapeHtml(skill.level)} dari 5">${buildDotsHtml(skill.level)}</p>
-                <div class="achievement-actions skill-actions">
-                    <button type="button"
-                            class="button button-star skill-star-btn${isStarredClass}"
-                            data-id="${escapeHtml(item.pk)}">
-                        <span aria-hidden="true">★</span>
-                        <span class="skill-star-text">${starText}</span>
-                        <span class="star-count">${escapeHtml(skill.star_count)}</span>
-                    </button>
+                <div class="achievement-actions">
+                    ${starHtml}
                     ${editHtml}
                     ${deleteHtml}
                 </div>
             `;
-            return articleElement;
+            return article;
         }
 
-        // Mengambil data skill lewat AJAX
+        // Mengambil daftar skill dari API
         async function fetchSkills(searchQuery = "") {
             if (skillsAbortController) skillsAbortController.abort();
             skillsAbortController = new AbortController();
@@ -181,33 +175,46 @@
             try {
                 displayPageSection({ showLoading: true });
 
-                const url = searchQuery
-                    ? `${BASE_SKILLS_ENDPOINT}?name=${encodeURIComponent(searchQuery)}`
-                    : BASE_SKILLS_ENDPOINT;
+                const url = new URL(BASE_SKILLS_ENDPOINT, window.location.origin);
+                if (searchQuery) url.searchParams.set('name', searchQuery);
 
                 const response = await fetch(url, {
-                    headers: { 'Accept': 'application/json' },
+                    headers: { Accept: 'application/json' },
                     signal: skillsAbortController.signal,
                 });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-                if (!response.ok) throw new Error('Failed to fetch data');
-
-                const skillData = await response.json();
-
-                if (skillData.length === 0) {
-                    displayPageSection({ showEmpty: true });
-                } else {
-                    gridContainer.innerHTML = '';
-                    skillData.forEach(item => {
-                        gridContainer.appendChild(buildSkillCardElement(item));
-                    });
-                    displayPageSection({ showGrid: true });
-                }
+                const skills = await response.json();
+                gridContainer.replaceChildren(...skills.map(buildSkillCardElement));
+                displayPageSection({ showGrid: skills.length > 0, showEmpty: skills.length === 0 });
             } catch (error) {
                 if (error.name === 'AbortError') return;
                 console.error('Error loading skills:', error);
                 displayPageSection({ showError: true });
             }
+        }
+
+        // Menyusun pesan error dari respons API (validasi 400 atau penolakan 403)
+        function apiErrorMessage(data, status) {
+            const messages = Object.values(data).flat().filter(value => typeof value === 'string');
+            return messages.join(' ') || `Permintaan gagal (HTTP ${status}).`;
+        }
+
+        // Satu tempat untuk semua permintaan yang mengubah data (POST/PATCH/DELETE)
+        async function writeSkill(url, method, payload) {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: payload === undefined ? undefined : JSON.stringify(payload),
+            });
+            if (response.status === 204) return null;
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(apiErrorMessage(data, response.status));
+            return data;
         }
 
         // Pencarian dengan debouncing
@@ -226,86 +233,94 @@
             searchSkills();
         });
 
-        // Star / unstar lewat AJAX
-        async function toggleSkillStar(button) {
-            if (!IS_AUTHENTICATED) {
-                window.location.href = "{% url 'main:login' %}";
-                return;
-            }
-            const url = STAR_URL_TEMPLATE.replace('/0/', `/${button.dataset.id}/`);
-            button.disabled = true;
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                });
-                const result = await response.json().catch(() => ({}));
-
-                if (response.ok) {
-                    button.classList.toggle('is-starred', result.is_starred);
-                    button.querySelector('.skill-star-text').textContent = result.is_starred ? 'Unstar' : 'Star';
-                    button.querySelector('.star-count').textContent = result.star_count;
-                } else {
-                    showToast('Gagal memberi star', result.message || `Terjadi kesalahan (status ${response.status}).`, 'error');
-                }
-            } catch (error) {
-                console.error('Error toggling star:', error);
-                showToast('Gagal memberi star', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
-            } finally {
-                button.disabled = false;
-            }
-        }
-
-        gridContainer.addEventListener('click', function (event) {
-            const button = event.target.closest('.skill-star-btn');
-            if (button) toggleSkillStar(button);
-        });
-
-        // Modal tambah skill
-        function closeSkillModal() {
-            document.getElementById('add-skill-modal').hidePopover();
-        }
-
+        // Tambah skill (POST /api/v1/skills/)
         async function addSkill(event) {
             event.preventDefault();
-
             const submitButton = skillForm.querySelector('button[type="submit"]');
             submitButton.disabled = true;
 
             try {
-                const response = await fetch(CREATE_SKILL_ENDPOINT, {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
-                    body: new FormData(skillForm),
+                const fields = new FormData(skillForm);
+                await writeSkill(BASE_SKILLS_ENDPOINT, 'POST', {
+                    name: fields.get('name'),
+                    level: Number(fields.get('level')),
                 });
-                const result = await response.json().catch(() => ({}));
-
-                if (response.ok) {
-                    skillForm.reset();
-                    closeSkillModal();
-                    showToast('Berhasil', 'Skill baru berhasil ditambahkan!', 'success');
-                    fetchSkills(searchInput.value.trim());
-                } else {
-                    const errorMessages = result.errors
-                        ? Object.values(result.errors).flat().map(error => error.message)
-                        : [result.message || `Terjadi kesalahan (status ${response.status}).`];
-                    showToast('Gagal menambahkan skill', errorMessages.join(' '), 'error');
-                }
+                skillForm.reset();
+                document.getElementById('add-skill-modal').hidePopover();
+                showToast('Berhasil', 'Skill baru berhasil ditambahkan!', 'success');
+                await fetchSkills(searchInput.value.trim());
             } catch (error) {
-                console.error('Error adding skill:', error);
-                showToast('Gagal menambahkan skill', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+                showToast('Gagal menambahkan skill', error.message, 'error');
             } finally {
                 submitButton.disabled = false;
             }
         }
 
-        // Modal hanya dirender untuk superuser, jadi skillForm bisa null
-        if (skillForm) {
-            skillForm.addEventListener('submit', addSkill);
+        // Edit skill (PATCH /api/v1/skills/<id>/)
+        function openEditModal(data) {
+            editingSkillId = data.id;
+            document.getElementById('edit-skill-name').value = data.name;
+            document.getElementById('edit-skill-level').value = data.level;
+            document.getElementById('edit-skill-modal').showPopover();
         }
 
-        // Start application
+        async function saveSkill(event) {
+            event.preventDefault();
+            const submitButton = editForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+
+            try {
+                await writeSkill(skillEndpoint(DETAIL_SKILL_ENDPOINT, editingSkillId), 'PATCH', {
+                    name: document.getElementById('edit-skill-name').value,
+                    level: Number(document.getElementById('edit-skill-level').value),
+                });
+                document.getElementById('edit-skill-modal').hidePopover();
+                showToast('Berhasil', 'Skill berhasil diperbarui!', 'success');
+                await fetchSkills(searchInput.value.trim());
+            } catch (error) {
+                showToast('Gagal memperbarui skill', error.message, 'error');
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        // Event delegation untuk tombol star, edit, dan hapus di dalam grid
+        gridContainer.addEventListener('click', async function (event) {
+            const button = event.target.closest('button[data-action]');
+            if (!button || button.disabled) return;
+            const action = button.dataset.action;
+
+            if (action === 'edit') {
+                openEditModal(button.dataset);
+                return;
+            }
+            if (action === 'delete' && !window.confirm('Yakin ingin menghapus skill ini?')) return;
+
+            button.disabled = true;
+            try {
+                const pattern = action === 'star' ? STAR_SKILL_ENDPOINT : DETAIL_SKILL_ENDPOINT;
+                await writeSkill(
+                    skillEndpoint(pattern, button.dataset.id),
+                    action === 'star' ? 'POST' : 'DELETE',
+                );
+                showToast(
+                    'Berhasil',
+                    action === 'star' ? 'Star diperbarui.' : 'Skill berhasil dihapus.',
+                    'success',
+                );
+                await fetchSkills(searchInput.value.trim());
+            } catch (error) {
+                showToast('Permintaan gagal', error.message, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        // Form hanya dirender untuk peran tertentu, jadi bisa null
+        if (skillForm) skillForm.addEventListener('submit', addSkill);
+        if (editForm) editForm.addEventListener('submit', saveSkill);
+
+        // Mulai aplikasi
         fetchSkills(searchInput.value.trim());
     </script>
 {% endblock content %}
