@@ -124,8 +124,7 @@ REST merupakan salah satu cara untuk membuat API agar frontend dan backend bisa 
 
 Menurut saya, penggunaan JSON saja belum berarti sebuah API sudah RESTful, karena JSON hanya digunakan sebagai format untuk mengirim data. API juga harus menggunakan metode HTTP dengan benar, memiliki URL yang jelas untuk setiap resource, dan memberikan status response yang sesuai dengan hasil permintaan.
 
-Untuk PUT dan PATCH, keduanya sama-sama digunakan untuk memperbarui data, tetapi cara kerjanya berbeda. PUT biasanya digunakan untuk mengganti seluruh data pada suatu resource, sedangkan PATCH cukup mengubah bagian yang diperlukan saja. Contohnya, jika saya hanya ingin mengganti nama Skill tanpa mengubah levelnya, saya bisa menggunakan PATCH dan hanya mengirim nama Skill yang baru.
-
+Untuk PUT dan PATCH, keduanya sama-sama digunakan untuk memperbarui data, tetapi cara kerjanya berbeda. PUT biasanya digunakan untuk mengganti seluruh data pada suatu resource, sedangkan PATCH cukup mengubah bagian tertentu saja. Contohnya, ketika saya ingin memperbarui seluruh data Skill, saya bisa menggunakan PUT dengan mengirim nama dan level Skill sekaligus. Sementara itu, jika saya hanya ingin mengubah nama Skill tanpa mengubah levelnya, saya bisa menggunakan PATCH dengan mengirim nama Skill yang baru saja.
 #### 2. Apa fungsi serializer dalam Django REST Framework dan apa kelebihannya dibandingkan JsonResponse?
 
 Serializer digunakan untuk mengubah data dari model Django menjadi format yang bisa dikirim melalui API, misalnya JSON. Selain itu, serializer juga bisa digunakan untuk memeriksa apakah data yang dikirim pengguna sudah sesuai sebelum disimpan ke database.
