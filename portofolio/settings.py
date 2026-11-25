@@ -177,3 +177,4 @@ if PRODUCTION:
         for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
         if origin.strip()
     ]
+    CORS_ALLOWED_ORIGINS += ["http://localhost:8080"]
