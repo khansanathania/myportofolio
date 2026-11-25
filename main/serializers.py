@@ -2,7 +2,7 @@
 from django.utils.html import strip_tags
 from rest_framework import serializers
 
-from main.models import Achievement, Skill
+from main.models import Achievement, Skill, Project
 
 
 class AchievementSerializer(serializers.ModelSerializer):
@@ -84,3 +84,31 @@ class SkillSerializer(serializers.ModelSerializer):
         if request is None or not request.user.is_authenticated:
             return False
         return request.user in obj.starred_by.all()
+    
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = [
+            "id",
+            "title",
+            "description",
+            "tech_stack",
+            "project_url",
+            "project_image_url",
+        ]
+        read_only_fields = ["id"]
+
+    def validate_title(self, value):
+        value = strip_tags(value).strip()
+        if not value:
+            raise serializers.ValidationError("Title cannot be empty.")
+        return value
+
+    def validate_description(self, value):
+        return strip_tags(value).strip()
+
+    def validate_tech_stack(self, value):
+        value = strip_tags(value).strip()
+        if not value:
+            raise serializers.ValidationError("Tech stack cannot be empty.")
+        return value

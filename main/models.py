@@ -54,3 +54,13 @@ class Skill(models.Model):
     
         def __str__(self):
             return f"{self.name} ({self.level}/5)"
+
+class Project(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    tech_stack = models.CharField(max_length=255)
+    project_url = models.URLField()
+    project_image_url = models.URLField(blank=True, default="")
+
+    def __str__(self):
+        return self.title

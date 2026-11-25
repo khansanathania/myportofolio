@@ -8,12 +8,11 @@ from rest_framework.decorators import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from main.models import Achievement, Skill
+from main.models import Achievement, Skill, Project
 from main.permissions import IsPortfolioOwnerOrEditorOrReadOnly
-from main.serializers import AchievementSerializer, SkillSerializer
+from main.serializers import (AchievementSerializer, SkillSerializer,  ProjectSerializer,)
 
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def achievement_list(request):
     if request.method in ("GET", "HEAD"):
@@ -51,7 +50,6 @@ def achievement_list(request):
 
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def achievement_detail(request, achievement_id):
     achievement = get_object_or_404(
@@ -84,7 +82,6 @@ def achievement_detail(request, achievement_id):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def achievement_star(request, achievement_id):
     achievement = get_object_or_404(
@@ -106,7 +103,6 @@ def achievement_star(request, achievement_id):
     return Response(serializer.data)
 
 @api_view(["GET", "HEAD", "POST"])
-@authentication_classes([SessionAuthentication])  # mengenali pengguna dari session login Django
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def skill_list(request):
     """GET: daftar skill (bisa dicari dengan ?name=...). POST: tambah skill (pemilik saja)."""
@@ -128,7 +124,6 @@ def skill_list(request):
 
 
 @api_view(["GET", "HEAD", "PUT", "PATCH", "DELETE"])
-@authentication_classes([SessionAuthentication])
 @permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
 def skill_detail(request, skill_id):
     """GET: detail. PUT/PATCH: ubah (pemilik dan Editor). DELETE: hapus (pemilik saja)."""
@@ -155,7 +150,6 @@ def skill_detail(request, skill_id):
 
 
 @api_view(["POST"])
-@authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated])  # semua akun yang login boleh memberi star
 def skill_star(request, skill_id):
     """Toggle star: POST pertama memberi star, POST berikutnya membatalkannya."""
@@ -168,4 +162,30 @@ def skill_star(request, skill_id):
     serializer = SkillSerializer(skill, context={"request": request})
     return Response(serializer.data)
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def api_logout(request):
+    if request.auth is not None:
+        request.auth.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET", "HEAD", "POST"])
+@permission_classes([IsPortfolioOwnerOrEditorOrReadOnly])
+def project_list(request):
+    # Menampilkan daftar proyek tanpa login
+    if request.method in ("GET", "HEAD"):
+        projects = Project.objects.order_by("title", "id")
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data)
+
+    # Menambahkan proyek dengan permission yang sesuai
+    serializer = ProjectSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+
+    return Response(
+        serializer.data,
+        status=status.HTTP_201_CREATED,
+    )
 
